@@ -9,9 +9,19 @@ import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ *  将 RestClinet 封装为单例交由 Spring 容易管理，不用关闭连接 建立长连接使用
+ *
+ *  如果不是单例的话 每次调用都会创建连接 不关闭会将导致资源被耗尽
+ */
+
 @Configuration
 public class ESClientConfig {
 
+    /**
+     * 配置 RestClientBuilder
+     * @return
+     */
     @Bean
     public RestClientBuilder restClientBuilder() {
         RestClientBuilder clientBuilder =
@@ -40,6 +50,11 @@ public class ESClientConfig {
         return clientBuilder;
     }
 
+    /**
+     * 创建 RestClient
+     * @param restClientBuilder
+     * @return
+     */
     @Bean
     public RestClient restClient(RestClientBuilder restClientBuilder) {
         return restClientBuilder.build();

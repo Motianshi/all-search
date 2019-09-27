@@ -7,7 +7,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
@@ -18,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -96,8 +94,6 @@ public class ESRestClientTest {
                 System.out.println(source.toString());
             }
 
-
-
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -107,13 +103,6 @@ public class ESRestClientTest {
                 e.printStackTrace();
             }
         }
-
-
-    }
-
-    private void getStringFromInputStream(InputStream content) {
-//        List<String> list = new ArrayList<>();
-//        while (content.)
 
     }
 }
