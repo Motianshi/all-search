@@ -10,8 +10,11 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.*;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -20,6 +23,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -70,14 +74,47 @@ public class ESRestHighClient {
 
     @Test
     public void testIndex() {
-        Map<String, String> source = new HashMap<>();
-        source.put("user", "anqi");
-        source.put("postDate", new Date()+"");
-        source.put("message", "this is message");
 
-        IndexRequest indexRequest = new IndexRequest("idx_fruit")
-                .id("1")
-                .source(source);
+
+        CreateIndexRequest createIndexRequest = new CreateIndexRequest("idx_clouthing");
+        /**
+         * 设置分片和复制
+         */
+//        createIndexRequest.settings(Settings.builder()
+//                .put("index.number_of_shards", 2)
+//                .put("index.number_of_replicas", 0)
+//                .build());
+        String settings =
+                "{\n" +
+                " \"number_of_shards\" : 1,\n" +
+                " \"number_of_replicas\" : 0\n" +
+                " }\n" ;
+        createIndexRequest.settings(settings, XContentType.JSON);
+
+        String mappings =
+                "{\n" +
+                "  \"properties\": {\n" +
+                "    \"name\": {\n" +
+                "      \"type\": \"text\"\n" +
+                "    },\n" +
+                "    \"price\": {\n" +
+                "      \"type\": \"double\"\n" +
+                "    },\n" +
+                "    \"num\": {\n" +
+                "      \"type\": \"integer\"\n" +
+                "    },\n" +
+                "    \"date\": {\n" +
+                "      \"type\": \"text\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+
+        System.out.println(mappings);
+
+        System.out.println(settings);
+
+
+        createIndexRequest.mapping(mappings, XContentType.JSON);
 
 //        DeleteRequest deleteRequest = new DeleteRequest("idx_fruit")
 //                .id("1");
@@ -87,7 +124,8 @@ public class ESRestHighClient {
 //        GetRequest getRequest = new GetRequest("idx_fruit").id("1");
 
         try {
-        IndexResponse indexResponse = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+            CreateIndexResponse createIndexResponse = restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
+            System.out.println(createIndexResponse.toString());
 
 //        restHighLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
 //
@@ -96,7 +134,6 @@ public class ESRestHighClient {
         }catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
 
