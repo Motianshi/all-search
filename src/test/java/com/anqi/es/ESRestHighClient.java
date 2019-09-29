@@ -104,7 +104,8 @@ public class ESRestHighClient {
                 "      \"type\": \"integer\"\n" +
                 "    },\n" +
                 "    \"date\": {\n" +
-                "      \"type\": \"text\"\n" +
+                "      \"type\": \"date\",\n" +
+                "      \"format\": \"yyyy-MM-dd\"\n" +
                 "    }\n" +
                 "  }\n" +
                 "}";
