@@ -28,7 +28,7 @@ public class RestHighLevelClientConfig {
         Header[] defaultHeaders = new Header[]{
                 new BasicHeader("Accept", "*/*"),
                 new BasicHeader("Charset", "UTF-8"),
-                //设置token 是为了安全 网关可以验证token来决定是否发起请求
+                //设置token 是为了安全 网关可以验证token来决定是否发起请求 我们这里只做象征性配置
                 new BasicHeader("E_TOKEN", "esestokentoken")
         };
         restClientBuilder.setDefaultHeaders(defaultHeaders);
@@ -36,7 +36,7 @@ public class RestHighLevelClientConfig {
         restClientBuilder.setFailureListener(new RestClient.FailureListener(){
             @Override
             public void onFailure(Node node) {
-                System.out.println("监听失败");
+                System.out.println("监听某个es节点失败");
             }
         });
 

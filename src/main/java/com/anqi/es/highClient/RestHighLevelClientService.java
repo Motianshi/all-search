@@ -34,6 +34,15 @@ public class RestHighLevelClientService {
     @Autowired
     private RestHighLevelClient client;
 
+
+    /**
+     * 创建索引
+     * @param indexName
+     * @param settings
+     * @param mapping
+     * @return
+     * @throws IOException
+     */
     public CreateIndexResponse createIndex(String indexName, String settings, String mapping) throws IOException{
         CreateIndexRequest request = new CreateIndexRequest(indexName);
 
@@ -46,7 +55,12 @@ public class RestHighLevelClientService {
         return client.indices().create(request, RequestOptions.DEFAULT);
     }
 
-
+    /**
+     * 删除索引
+     * @param indexNames
+     * @return
+     * @throws IOException
+     */
     public AcknowledgedResponse deleteIndex(String ... indexNames) throws IOException{
         DeleteIndexRequest request = new DeleteIndexRequest(indexNames);
 
@@ -54,21 +68,48 @@ public class RestHighLevelClientService {
     }
 
 
+    /**
+     * 判断 index 是否存在
+     * @param indexName
+     * @return
+     * @throws IOException
+     */
     public boolean indexExists(String indexName) throws IOException {
         GetIndexRequest request = new GetIndexRequest(indexName);
         return client.indices().exists(request, RequestOptions.DEFAULT);
     }
 
+    /**
+     * 根据 id 删除指定索引中的文档
+     * @param indexName
+     * @param id
+     * @return
+     * @throws IOException
+     */
     public DeleteResponse deleteDoc(String indexName, String id) throws IOException{
         DeleteRequest request = new DeleteRequest(indexName, id);
         return client.delete(request, RequestOptions.DEFAULT);
     }
 
+    /**
+     * 根据 id 更新指定索引中的文档
+     * @param indexName
+     * @param id
+     * @return
+     * @throws IOException
+     */
     public UpdateResponse updateDoc(String indexName, String id) throws IOException{
         UpdateRequest request = new UpdateRequest(indexName, id);
         return client.update(request, RequestOptions.DEFAULT);
     }
 
+    /**
+     * 添加文档
+     * @param indexName
+     * @param source
+     * @return
+     * @throws IOException
+     */
     public IndexResponse addDoc(String indexName, String source) throws IOException{
         IndexRequest request = new IndexRequest(indexName);
 
@@ -89,6 +130,16 @@ public class RestHighLevelClientService {
         return client.search(request, RequestOptions.DEFAULT);
     }
 
+    /**
+     * term 查询 精准匹配
+     * @param field
+     * @param key
+     * @param page
+     * @param size
+     * @param indexNames
+     * @return
+     * @throws IOException
+     */
     public SearchResponse termSearch(String field, String key, int page, int size, String ... indexNames) throws IOException{
         SearchRequest request = new SearchRequest(indexNames);
         SearchSourceBuilder builder = new SearchSourceBuilder();
