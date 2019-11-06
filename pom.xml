@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.anqi.es</groupId>
-    <artifactId>demo-es</artifactId>
+    <artifactId>all-search</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>demo-es</name>
     <description>Demo project for Spring Boot</description>

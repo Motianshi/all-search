@@ -13,6 +13,8 @@
 + rest-client 版本较低无法支持新特性
 + SpringBoot的Es模板ElasticsearchRepository更新较慢，不支持高版本的ES
 
+## 使用方式
+`git clone`按需复制到自己的项目组即可
 
 ## 组件版本
 | 组件                     | Version       |
@@ -28,25 +30,24 @@
 ```
 ├── src
 │   ├── main
-│   │   ├── java
-│   │   │   └── com
-│   │   │       └── anqi
-│   │   │           └── es
-│   │   │               ├── DemoEsApplication.java
-│   │   │               ├── Main.java
-│   │   │               ├── client
-│   │   │               │   └── ESClientConfig.java     老版本RestClient封装，这里不会使用
-│   │   │               ├── controller
-│   │   │               │   └── EsController.java       搜索测试接口
-│   │   │               ├── highclient
-│   │   │               │   ├── RestHighLevelClientConfig.java      Client配置
-│   │   │               │   └── RestHighLevelClientService.java     搜索API
-│   │   │               └── util
-│   │   │                   └── SnowflakeIdWorker.java      Twitter的雪花算法用来生成文档id
-│   │   └── resources
-│   │       ├── application.properties
-│   │       ├── static
-│   │       └── templates
+│      ├── java
+│      │   └── com
+│      │       └── anqi
+│      │           └── es
+│      │               ├── DemoEsApplication.java
+│      │               ├── Main.java
+│      │               ├── client
+│      │               │   └── ESClientConfig.java     老版本RestClient封装，这里不会使用
+│      │               ├── controller
+│      │               │   └── EsController.java       搜索测试接口
+│      │               ├── highclient
+│      │               │   ├── RestHighLevelClientConfig.java      Client配置
+│      │               │   └── RestHighLevelClientService.java     搜索API
+│      │               └── util
+│      │                   └── SnowflakeIdWorker.java      Twitter的雪花算法用来生成文档id
+│      └── resources
+│          ├── application.properties
+│          ├── static
+│          └── templates
 ├── pom.xml
-
 ```
