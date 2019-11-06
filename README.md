@@ -14,7 +14,7 @@
 + SpringBoot的Es模板ElasticsearchRepository更新较慢，不支持高版本的ES
 
 ## 使用方式
-`git clone`按需复制到自己的项目组即可
+`git clone`按需复制到自己的项目里即可
 
 ## 组件版本
 | 组件                     | Version       |
