@@ -109,6 +109,7 @@ public class RestHighLevelClientService {
         request.doc(XContentType.JSON, updateJson);
         return client.update(request, RequestOptions.DEFAULT);
     }
+    
     /**
      * 根据 id 更新指定索引中的文档
      * @param indexName
@@ -151,9 +152,7 @@ public class RestHighLevelClientService {
         request.source(source, XContentType.JSON);
 
         return client.index(request, RequestOptions.DEFAULT);
-
     }
-
 
     /**
      * 模糊匹配
@@ -241,7 +240,5 @@ public class RestHighLevelClientService {
         }
         return client.bulk(request, RequestOptions.DEFAULT);
     }
-
-
 
 }
