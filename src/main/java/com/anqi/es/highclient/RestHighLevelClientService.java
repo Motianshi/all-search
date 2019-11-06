@@ -234,6 +234,9 @@ public class RestHighLevelClientService {
      * @throws IOException
      */
     public BulkResponse importAll(String indexName, String ... source) throws IOException{
+        if (0 == source.length){
+            //todo 抛出异常 导入数据为空
+        }
         BulkRequest request = new BulkRequest();
         for (String s : source) {
             request.add(new IndexRequest(indexName).source(s, XContentType.JSON));
