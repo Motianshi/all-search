@@ -1,10 +1,27 @@
-## 使用指南
-<p align="center">
-  <a href=""><img src="https://img.shields.io/badge/版本-1.0-brightgreen.svg" alt="版本"></a>
-  <a href="#公众号"><img src="https://img.shields.io/badge/公众号-Java后端架构充电宝-blue.svg" alt="公众号"></a>
-  <a href="#投稿"><img src="https://img.shields.io/badge/support-投稿-critical.svg" alt="投稿"></a>
-  <a href="https://www.cnblogs.com/haixiang/p/11078875.html"><img src="https://img.shields.io/badge/blog-Haixiang-important" alt="博客"></a>
-</p>
+<a href="https://www.cnblogs.com/haixiang/p/11078875.html"><img src="https://img.shields.io/badge/博客-Haixiang-important" alt="博客"></a>
+<a href="#"><img src="https://img.shields.io/badge/版本-1.0-brightgreen.svg" alt="版本"></a>
+<a href="#"><img src="https://img.shields.io/badge/公众号-Java后端架构充电宝-blue.svg" alt="公众号"></a>
+
+## 简介
++ 基于ElasticSearch7.3.2版本的通用搜索系统
++ 使用rest-high-level-client操作ES
++ 封装常用api，包含索引的CRUD、文档的CRUD、索引定制化、模糊搜索、精准匹配搜索
++ 是一套操作简单的搜索系统脚手架，稍加修改即可在项目中快速搭建起搜索系统
+
+## 使用rest-high-level-client整合Es的原因
++ TransportClient 存在并发瓶颈
++ rest-client 版本较低无法支持新特性
++ SpringBoot的Es模板ElasticsearchRepository更新较慢，不支持高版本的ES
+
+
+## 组件版本
+| 组件                     | Version       |
+| ------------------------ | ------------- |
+| Elasticsearch            | 7.3.2         |
+| Elasticsearch-rest-high-level-client | 7.3.2         |
+| Fastjson                 | 1.2.60        |
+| SpringBoot               | 2.1.0.RELEASE |
+
 
 
 ## 目录
@@ -30,18 +47,6 @@
 │   │       ├── application.properties
 │   │       ├── static
 │   │       └── templates
-│   └── test
-│       ├── java
-│       │   └── com
-│       │       └── anqi
-│       │           └── es
-│       │               ├── DemoEsApplicationTests.java
-│       │               ├── ESRestClientTest.java
-│       │               ├── ESRestHighClient.java
-│       │               └── highclient
-│       │                   └── RestHighLevelClientServiceTest.java
-│       └── resources
-│           └── application.properties
 ├── pom.xml
 
 ```
