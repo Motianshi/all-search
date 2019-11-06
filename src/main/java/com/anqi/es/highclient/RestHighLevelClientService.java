@@ -152,7 +152,6 @@ public class RestHighLevelClientService {
         request.source(source, XContentType.JSON);
 
         return client.index(request, RequestOptions.DEFAULT);
-
     }
 
     /**
