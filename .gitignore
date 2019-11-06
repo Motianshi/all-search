@@ -4,6 +4,8 @@ target/
 !**/src/main/**
 !**/src/test/**
 
+.DS_Store
+
 ### STS ###
 .apt_generated
 .classpath
@@ -27,5 +29,4 @@ target/
 /.nb-gradle/
 build/
 
-### VS Code ###
-.vscode/
+

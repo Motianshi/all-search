@@ -1,4 +1,4 @@
-package com.anqi.es.highClient;
+package com.anqi.es.highclient;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -10,14 +10,17 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * @author anqi
+ */
 @Configuration
 public class RestHighLevelClientConfig {
 
-    String hostname;
+    private String hostname;
 
-    int port;
+    private int port;
 
-    String scheme;
+    private String scheme;
 
     @Bean
     public RestClientBuilder restClientBuilder() {

@@ -1,4 +1,4 @@
-package com.anqi.es.highClient;
+package com.anqi.es.highclient;
 
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -17,17 +17,23 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.reindex.UpdateByQueryRequest;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Map;
 
-//DeleteRequest GetRequest UpdateRequest 都是根据 id 操作文档，在实际应用中不常用
+//DeleteRequest GetRequest UpdateRequest 都是根据 id 操作文档
 
+/**
+ * @author anqi
+ */
 @Service
 public class RestHighLevelClientService {
 
@@ -98,9 +104,38 @@ public class RestHighLevelClientService {
      * @return
      * @throws IOException
      */
-    public UpdateResponse updateDoc(String indexName, String id) throws IOException{
+    public UpdateResponse updateDoc(String indexName, String id, String updateJson) throws IOException{
         UpdateRequest request = new UpdateRequest(indexName, id);
+        request.doc(XContentType.JSON, updateJson);
         return client.update(request, RequestOptions.DEFAULT);
+    }
+    /**
+     * 根据 id 更新指定索引中的文档
+     * @param indexName
+     * @param id
+     * @return
+     * @throws IOException
+     */
+    public UpdateResponse updateDoc(String indexName, String id, Map<String,Object> updateMap) throws IOException{
+        UpdateRequest request = new UpdateRequest(indexName, id);
+        request.doc(updateMap);
+        return client.update(request, RequestOptions.DEFAULT);
+    }
+
+    /**
+     * 根据某字段的 k-v 更新索引中的文档
+     * @param fieldName
+     * @param value
+     * @param indexName
+     * @throws IOException
+     */
+    public void updateByQuery(String fieldName, String value, String ... indexName) throws IOException {
+        UpdateByQueryRequest request = new UpdateByQueryRequest(indexName);
+        //单词处理文档数量
+        request.setBatchSize(100)
+                .setQuery(new TermQueryBuilder(fieldName, value))
+                .setTimeout(TimeValue.timeValueMinutes(2));
+        client.updateByQuery(request, RequestOptions.DEFAULT);
     }
 
     /**
@@ -120,12 +155,38 @@ public class RestHighLevelClientService {
     }
 
 
+    /**
+     * 模糊匹配
+     * @param field
+     * @param key
+     * @param page
+     * @param size
+     * @param indexNames
+     * @return
+     * @throws IOException
+     */
     public SearchResponse search(String field, String key, int page, int size, String ... indexNames) throws IOException{
         SearchRequest request = new SearchRequest(indexNames);
         SearchSourceBuilder builder = new SearchSourceBuilder();
         builder.query(new MatchQueryBuilder(field, key))
                 .from(page)
                 .size(size);
+        request.source(builder);
+        return client.search(request, RequestOptions.DEFAULT);
+    }
+
+    /**
+     * 模糊匹配
+     * @param field
+     * @param key
+     * @param indexNames
+     * @return
+     * @throws IOException
+     */
+    public SearchResponse search(String field, String key, String ... indexNames) throws IOException{
+        SearchRequest request = new SearchRequest(indexNames);
+        SearchSourceBuilder builder = new SearchSourceBuilder();
+        builder.query(new MatchQueryBuilder(field, key));
         request.source(builder);
         return client.search(request, RequestOptions.DEFAULT);
     }
@@ -150,6 +211,29 @@ public class RestHighLevelClientService {
         return client.search(request, RequestOptions.DEFAULT);
     }
 
+    /**
+     * term 查询 精准匹配
+     * @param field
+     * @param key
+     * @param indexNames
+     * @return
+     * @throws IOException
+     */
+    public SearchResponse termSearch(String field, String key, String ... indexNames) throws IOException{
+        SearchRequest request = new SearchRequest(indexNames);
+        SearchSourceBuilder builder = new SearchSourceBuilder();
+        builder.query(new TermQueryBuilder(field, key));
+        request.source(builder);
+        return client.search(request, RequestOptions.DEFAULT);
+    }
+
+    /**
+     * 批量导入
+     * @param indexName
+     * @param source
+     * @return
+     * @throws IOException
+     */
     public BulkResponse importAll(String indexName, String ... source) throws IOException{
         BulkRequest request = new BulkRequest();
         for (String s : source) {

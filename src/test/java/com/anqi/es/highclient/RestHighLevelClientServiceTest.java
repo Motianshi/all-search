@@ -1,10 +1,8 @@
-package com.anqi.es.highClient;
+package com.anqi.es.highclient;
 
 import com.anqi.es.DemoEsApplication;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.search.SearchHit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,11 +13,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.*;
 
 //有RunWith才会有ioc容器
 @SpringBootTest(classes = DemoEsApplication.class)
@@ -38,7 +31,8 @@ public class RestHighLevelClientServiceTest {
                         " \"number_of_replicas\" : 0\n" +
                         " }\n" ;
 
-        //设置 id 为 keyword 不分词，用来精准匹配，存放主键
+
+        //设置 id 为 keyword 不分词，用来精准匹配，存放主键 可以设置 index : true 来让属性只存储，不会被查到
         String mappings =
                 "{\n" +
                         "  \"properties\": {\n" +

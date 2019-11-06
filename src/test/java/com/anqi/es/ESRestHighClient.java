@@ -1,21 +1,12 @@
 package com.anqi.es;
 
+import com.anqi.es.highclient.RestHighLevelClientService;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.message.BasicHeader;
-import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.*;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.CreateIndexResponse;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -28,16 +19,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class ESRestHighClient {
 
     RestHighLevelClient restHighLevelClient;
+
+    @Autowired
+    RestHighLevelClientService service;
 
     @Before
     public void testRestHighClinet() {
@@ -70,13 +61,14 @@ public class ESRestHighClient {
 
 
 
+
     }
 
     @Test
     public void testIndex() {
 
 
-        CreateIndexRequest createIndexRequest = new CreateIndexRequest("idx_clouthing");
+
         /**
          * 设置分片和复制
          */
@@ -89,7 +81,6 @@ public class ESRestHighClient {
                 " \"number_of_shards\" : 1,\n" +
                 " \"number_of_replicas\" : 0\n" +
                 " }\n" ;
-        createIndexRequest.settings(settings, XContentType.JSON);
 
         String mappings =
                 "{\n" +
@@ -110,12 +101,14 @@ public class ESRestHighClient {
                 "  }\n" +
                 "}";
 
-        System.out.println(mappings);
 
-        System.out.println(settings);
+        try {
+            service.createIndex("idx_clouthing", settings, mappings);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("创建索引失败");
+        }
 
-
-        createIndexRequest.mapping(mappings, XContentType.JSON);
 
 //        DeleteRequest deleteRequest = new DeleteRequest("idx_fruit")
 //                .id("1");
@@ -124,17 +117,6 @@ public class ESRestHighClient {
 //
 //        GetRequest getRequest = new GetRequest("idx_fruit").id("1");
 
-        try {
-            CreateIndexResponse createIndexResponse = restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
-            System.out.println(createIndexResponse.toString());
-
-//        restHighLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
-//
-
-//            restHighLevelClient.close();
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 
