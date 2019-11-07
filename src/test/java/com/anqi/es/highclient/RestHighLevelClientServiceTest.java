@@ -5,9 +5,14 @@ import com.anqi.es.DemoEsApplication;
 import com.anqi.es.entity.Cloth;
 import com.anqi.es.util.SnowflakeIdWorker;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
+import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +22,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 //有RunWith才会有ioc容器
@@ -38,8 +44,6 @@ public class RestHighLevelClientServiceTest {
 
 
         //设置 id 为 keyword 不分词，用来精准匹配，存放主键 可以设置 index : true 来让属性只存储，不会被查到
-
-
         String mappings =
                 "{\n" +
                         "  \"properties\": {\n" +
@@ -58,7 +62,7 @@ public class RestHighLevelClientServiceTest {
                         "     \"type\": \"double\"\n" +
                         "   },\n" +
                         "   \"date\": {\n" +
-                        "    \"format\": \"yyyy-MM-dd\",\n" +
+                        "    \"format\": \"yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis\",\n" +
                         "     \"type\": \"date\"\n" +
                         "   },\n" +
                         "   \"num\": {\n" +
@@ -66,12 +70,18 @@ public class RestHighLevelClientServiceTest {
                         "     }\n" +
                         "  }\n" +
                         "}";
-        service.createIndex("idx_cloth", settings, mappings);
+        CreateIndexResponse response = service.createIndex("idx_cloth", settings, mappings);
+        if (response.isAcknowledged()) {
+            System.out.println("创建成功");
+        }
     }
 
     @Test
     public void deleteIndex() throws IOException{
-        service.deleteIndex("idx_cloth");
+        AcknowledgedResponse response = service.deleteIndex("idx_cloth");
+        if (response.isAcknowledged()) {
+            System.out.println("删除成功");
+        }
     }
 
     @Test
@@ -82,44 +92,45 @@ public class RestHighLevelClientServiceTest {
 
     @Test
     public void addDoc() throws IOException {
-        String source = "{\n" +
-                "  \"id\" : \"item id\",\n" +
-                "  \"name\" : \"adidas cloth9\",\n" +
-                "  \"price\" : 299,\n" +
-                "  \"num\" : 100,\n" +
-                "  \"date\" : \"2019-09-10\"\n" +
-                "}";
+        SnowflakeIdWorker idWorker = new SnowflakeIdWorker(0, 0);
+        Cloth cloth = new Cloth(idWorker.nextId()+"","新版日系毛衣", "潮流前线等你来Pick!", 50, 199.99, new Date());
+        String source = JSON.toJSONString(cloth);
         IndexResponse response = service.addDoc("idx_cloth", source);
-        System.out.println(response.toString());
+        System.out.println(response.status());
     }
 
     @Test
     public void search() throws IOException{
-        SearchResponse response = service.search("name", "adidas",0, 5, "idx_clouthing");
+        SearchResponse response = service.search("name", "毛衣", 0, 30, "idx_cloth");
         Arrays.asList(response.getHits().getHits())
                 .forEach(e -> System.out.println(e.getSourceAsString()));
     }
 
     @Test
     public void termSearch() throws IOException{
-       // SearchResponse response = service.termSearch("name", "")
+        SearchResponse response = service.termSearch("name", "nike潮流毛衣", 0, 50);
+        SearchHits hits = response.getHits();
+        for (SearchHit hit : hits) {
+            System.out.println(hit.getSourceAsString());
+        }
     }
 
     @Test
     public void deleteDoc() throws IOException{
-        String id = "";
-        SearchResponse search = service.search("id", "2", 0, 5, "idx_clouthing");
+        String id = "yvJ_Q24BymdyZW22Os2D";
+        SearchResponse search = service.search("id", "2", 0, 5, "idx_cloth");
 
         for (SearchHit hit : search.getHits().getHits()) {
             id = hit.getId();
         }
-        service.deleteDoc("idx_clouthing", id);
+        DeleteResponse response = service.deleteDoc("idx_cloth", id);
+        if (response.status().equals(RestStatus.OK)) {
+            System.out.println("删除成功");
+        }
     }
 
     @Test
     public void importAll() throws IOException{
-
-
         List<Cloth> list = buildJson();
 
         String[] cloths = new String[list.size()];
@@ -128,11 +139,16 @@ public class RestHighLevelClientServiceTest {
             cloths[i] = JSON.toJSONString(list.get(i));
         }
 
-//        for (String cloth : cloths) {
-//            System.out.println(cloth);
-//        }
+        for (String cloth : cloths) {
+            System.out.println(cloth);
+        }
 
-        BulkResponse bulk = service.importAll("idx_cloth", cloths);
+        BulkResponse bulk = service.importAll("idx_cloth", true, cloths);
+
+        if (bulk.hasFailures()) {
+            System.out.println("批量失败");
+            System.out.println(bulk.buildFailureMessage());
+        }
 
     }
 
@@ -154,12 +170,13 @@ public class RestHighLevelClientServiceTest {
 
         Random random = new Random();
         DecimalFormat df = new DecimalFormat( "0.00");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         for (int i = 0; i < 100; i++) {
             cloths.add(new Cloth(idWorker.nextId()+"",
                     tags[random.nextInt(tags.length)] + adj[random.nextInt(adj.length)] + cls[random.nextInt(cls.length)],
                     descPre[random.nextInt(descPre.length)] + descAft[random.nextInt(descAft.length)],
-                    random.nextInt(200),Double.valueOf(df.format(random.nextDouble()*300)),new Date()
+                    random.nextInt(200),Double.valueOf(df.format(random.nextDouble()*300)), new Date()
             ));
         }
 

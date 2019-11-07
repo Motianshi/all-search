@@ -1,5 +1,6 @@
 package com.anqi.es.highclient;
 
+import com.alibaba.fastjson.JSONObject;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -20,6 +21,7 @@ import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.reindex.UpdateByQueryRequest;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -39,7 +41,6 @@ public class RestHighLevelClientService {
 
     @Autowired
     private RestHighLevelClient client;
-
 
     /**
      * 创建索引
@@ -69,7 +70,6 @@ public class RestHighLevelClientService {
      */
     public AcknowledgedResponse deleteIndex(String ... indexNames) throws IOException{
         DeleteIndexRequest request = new DeleteIndexRequest(indexNames);
-
         return client.indices().delete(request, RequestOptions.DEFAULT);
     }
 
@@ -132,7 +132,7 @@ public class RestHighLevelClientService {
      */
     public void updateByQuery(String fieldName, String value, String ... indexName) throws IOException {
         UpdateByQueryRequest request = new UpdateByQueryRequest(indexName);
-        //单词处理文档数量
+        //单次处理文档数量
         request.setBatchSize(100)
                 .setQuery(new TermQueryBuilder(fieldName, value))
                 .setTimeout(TimeValue.timeValueMinutes(2));
@@ -140,7 +140,23 @@ public class RestHighLevelClientService {
     }
 
     /**
-     * 添加文档
+     * 添加文档 手动指定id
+     * @param indexName
+     * @param id
+     * @param source
+     * @return
+     * @throws IOException
+     */
+    public IndexResponse addDoc(String indexName, String id, String source) throws IOException{
+        IndexRequest request = new IndexRequest(indexName);
+
+        request.id(id).source(source, XContentType.JSON);
+
+        return client.index(request, RequestOptions.DEFAULT);
+    }
+
+    /**
+     * 添加文档 使用自动id
      * @param indexName
      * @param source
      * @return
@@ -155,7 +171,7 @@ public class RestHighLevelClientService {
     }
 
     /**
-     * 模糊匹配
+     * 模糊匹配 默认分页为 0,10
      * @param field
      * @param key
      * @param page
@@ -175,22 +191,6 @@ public class RestHighLevelClientService {
     }
 
     /**
-     * 模糊匹配
-     * @param field
-     * @param key
-     * @param indexNames
-     * @return
-     * @throws IOException
-     */
-    public SearchResponse search(String field, String key, String ... indexNames) throws IOException{
-        SearchRequest request = new SearchRequest(indexNames);
-        SearchSourceBuilder builder = new SearchSourceBuilder();
-        builder.query(new MatchQueryBuilder(field, key));
-        request.source(builder);
-        return client.search(request, RequestOptions.DEFAULT);
-    }
-
-    /**
      * term 查询 精准匹配
      * @param field
      * @param key
@@ -203,43 +203,35 @@ public class RestHighLevelClientService {
     public SearchResponse termSearch(String field, String key, int page, int size, String ... indexNames) throws IOException{
         SearchRequest request = new SearchRequest(indexNames);
         SearchSourceBuilder builder = new SearchSourceBuilder();
-        builder.query(new TermQueryBuilder(field, key))
+        builder.query(QueryBuilders.termsQuery(field, key))
                 .from(page)
                 .size(size);
         request.source(builder);
         return client.search(request, RequestOptions.DEFAULT);
     }
 
-    /**
-     * term 查询 精准匹配
-     * @param field
-     * @param key
-     * @param indexNames
-     * @return
-     * @throws IOException
-     */
-    public SearchResponse termSearch(String field, String key, String ... indexNames) throws IOException{
-        SearchRequest request = new SearchRequest(indexNames);
-        SearchSourceBuilder builder = new SearchSourceBuilder();
-        builder.query(new TermQueryBuilder(field, key));
-        request.source(builder);
-        return client.search(request, RequestOptions.DEFAULT);
-    }
 
     /**
      * 批量导入
      * @param indexName
+     * @param isAutoId 使用自动id 还是使用传入对象的id
      * @param source
      * @return
      * @throws IOException
      */
-    public BulkResponse importAll(String indexName, String ... source) throws IOException{
+    public BulkResponse importAll(String indexName, boolean isAutoId,  String ... source) throws IOException{
         if (0 == source.length){
             //todo 抛出异常 导入数据为空
         }
         BulkRequest request = new BulkRequest();
-        for (String s : source) {
-            request.add(new IndexRequest(indexName).source(s, XContentType.JSON));
+        if (isAutoId) {
+            for (String s : source) {
+                request.add(new IndexRequest(indexName).source(s, XContentType.JSON));
+            }
+        } else {
+            for (String s : source) {
+                request.add(new IndexRequest(indexName).id(JSONObject.parseObject(s).getString("id")).source(s, XContentType.JSON));
+            }
         }
         return client.bulk(request, RequestOptions.DEFAULT);
     }
