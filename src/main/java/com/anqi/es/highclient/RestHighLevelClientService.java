@@ -52,7 +52,6 @@ public class RestHighLevelClientService {
      */
     public CreateIndexResponse createIndex(String indexName, String settings, String mapping) throws IOException{
         CreateIndexRequest request = new CreateIndexRequest(indexName);
-
         if (null != settings && !"".equals(settings)) {
             request.settings(settings, XContentType.JSON);
         }
@@ -149,9 +148,7 @@ public class RestHighLevelClientService {
      */
     public IndexResponse addDoc(String indexName, String id, String source) throws IOException{
         IndexRequest request = new IndexRequest(indexName);
-
         request.id(id).source(source, XContentType.JSON);
-
         return client.index(request, RequestOptions.DEFAULT);
     }
 
@@ -164,9 +161,7 @@ public class RestHighLevelClientService {
      */
     public IndexResponse addDoc(String indexName, String source) throws IOException{
         IndexRequest request = new IndexRequest(indexName);
-
         request.source(source, XContentType.JSON);
-
         return client.index(request, RequestOptions.DEFAULT);
     }
 

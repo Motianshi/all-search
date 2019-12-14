@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Iterator;
 
 @SpringBootTest
@@ -150,6 +151,12 @@ public class ESRestHighClient {
             }
         }
         System.out.println(response.getHits());
+    }
+
+    @Test
+    public void testMain() {
+        Date date = new Date();
+        System.out.println(date.getTime());
     }
 
 }
