@@ -98,12 +98,79 @@ public class ESRestHighClient {
 
     @Test
     public void addDoc() {
-        service.addDoc();
+    }
+
+    @Test
+    public void bulk() throws IOException {
+        //不需要[]，奇不奇怪
+        String bulkVal = "[" +
+                "\n" +
+                "  {\n" +
+                "  \"proId\" : \"1\",\n" +
+                "  \"name\" : \"冬日工装裤\",\n" +
+                "  \"timestamp\" : 1576312053946,\n" +
+                "  \"createTime\" : \"2019-12-12 12:56:56\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "  \"proId\" : \"2\",\n" +
+                "  \"name\" : \"冬日羽绒服\",\n" +
+                "  \"timestamp\" : 1576313210024,\n" +
+                "  \"createTime\" : \"2019-12-10 10:50:50\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "  \"proId\" : \"3\",\n" +
+                "  \"name\" : \"花花公子外套\",\n" +
+                "  \"timestamp\" : 1576313239816,\n" +
+                "  \"createTime\" : \"2019-12-19 12:50:50\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "  \"proId\" : \"4\",\n" +
+                "  \"name\" : \"花花公子羽绒服\",\n" +
+                "  \"timestamp\" : 1576313264391,\n" +
+                "  \"createTime\" : \"2019-12-12 11:56:56\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "  \"proId\" : \"5\",\n" +
+                "  \"name\" : \"花花公子暖心羽绒服\",\n" +
+                "  \"timestamp\" : 1576313264491,\n" +
+                "  \"createTime\" : \"2019-12-19 11:56:56\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "  \"proId\" : \"6\",\n" +
+                "  \"name\" : \"花花公子帅气外套\",\n" +
+                "  \"timestamp\" : 1576313264691,\n" +
+                "  \"createTime\" : \"2019-12-19 15:56:56\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "  \"proId\" : \"7\",\n" +
+                "  \"name\" : \"冬天暖心羽绒服\",\n" +
+                "  \"timestamp\" : 1576313265491,\n" +
+                "  \"createTime\" : \"2019-12-19 17:56:56\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "  \"proId\" : \"8\",\n" +
+                "  \"name\" : \"冬天超级暖心羽绒服\",\n" +
+                "  \"timestamp\" : 1576313275491,\n" +
+                "  \"createTime\" : \"2019-12-20 17:56:56\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "  \"proId\" : \"9\",\n" +
+                "  \"name\" : \"\",\n" +
+                "  \"timestamp\" : 1576313275491,\n" +
+                "  \"createTime\" : \"2019-12-20 17:56:56\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "  \"proId\" : \"9\",\n" +
+                "  \"name\" : [],\n" +
+                "  \"timestamp\" : 1576313275491,\n" +
+                "  \"createTime\" : \"2019-12-20 17:56:56\"\n" +
+                "  }\n" +
+                "]";
+        service.importAll("idx_pro", true, bulkVal);
     }
 
     @Test
     public void testSearch() {
-        service.
     }
 
     @Test

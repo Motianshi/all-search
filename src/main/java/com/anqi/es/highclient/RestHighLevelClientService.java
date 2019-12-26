@@ -1,5 +1,7 @@
 package com.anqi.es.highclient;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -215,18 +217,22 @@ public class RestHighLevelClientService {
      * @return
      * @throws IOException
      */
-    public BulkResponse importAll(String indexName, boolean isAutoId,  String ... source) throws IOException{
-        if (0 == source.length){
+    public BulkResponse importAll(String indexName, boolean isAutoId,  String  source) throws IOException{
+        if (0 == source.length()){
             //todo 抛出异常 导入数据为空
         }
         BulkRequest request = new BulkRequest();
+
+        JSONArray array = JSON.parseArray(source);
+
+        //todo 识别json数组
         if (isAutoId) {
-            for (String s : source) {
+            for (Object s : array) {
                 request.add(new IndexRequest(indexName).source(s, XContentType.JSON));
             }
         } else {
-            for (String s : source) {
-                request.add(new IndexRequest(indexName).id(JSONObject.parseObject(s).getString("id")).source(s, XContentType.JSON));
+            for (Object s : array) {
+                request.add(new IndexRequest(indexName).id(JSONObject.parseObject(s.toString()).getString("id")).source(s, XContentType.JSON));
             }
         }
         return client.bulk(request, RequestOptions.DEFAULT);
