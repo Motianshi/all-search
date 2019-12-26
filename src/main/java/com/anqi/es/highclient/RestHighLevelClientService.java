@@ -148,7 +148,10 @@ public class RestHighLevelClientService {
      */
     public IndexResponse addDoc(String indexName, String id, String source) throws IOException{
         IndexRequest request = new IndexRequest(indexName);
-        request.id(id).source(source, XContentType.JSON);
+        if (null != id) {
+            request.id(id);
+        }
+        request.source(source, XContentType.JSON);
         return client.index(request, RequestOptions.DEFAULT);
     }
 
@@ -160,13 +163,11 @@ public class RestHighLevelClientService {
      * @throws IOException
      */
     public IndexResponse addDoc(String indexName, String source) throws IOException{
-        IndexRequest request = new IndexRequest(indexName);
-        request.source(source, XContentType.JSON);
-        return client.index(request, RequestOptions.DEFAULT);
+        return addDoc(indexName, null, source);
     }
 
     /**
-     * 模糊匹配 默认分页为 0,10
+     * 简单模糊匹配 默认分页为 0,10
      * @param field
      * @param key
      * @param page
